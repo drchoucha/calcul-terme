@@ -78,6 +78,48 @@
   .menu-card.card-ref { background: linear-gradient(135deg, #e8f6fb, #d6eef8); border-color: #1a8fb8; }
   .menu-card.card-ref .menu-icon { background: linear-gradient(135deg, #1a8fb8, #2ec4b6); }
   .menu-card.card-ref .menu-text .title { color: #0d6a8c; }
+
+  .install-box {
+    margin-top: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 14px;
+    overflow: hidden;
+    backdrop-filter: blur(2px);
+  }
+  .install-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .install-chevron {
+    transition: transform 0.2s;
+    font-size: 16px;
+  }
+  .install-chevron.open { transform: rotate(180deg); }
+  .install-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease, padding 0.25s ease;
+    padding: 0 18px;
+  }
+  .install-body.open {
+    max-height: 300px;
+    padding: 0 18px 16px 18px;
+  }
+  .install-body ol {
+    color: #eafaf5;
+    font-size: 13px;
+    line-height: 1.7;
+    padding-left: 20px;
+  }
+  .install-body b { color: #fff; }
   .menu-icon {
     font-size: 28px;
     width: 54px;
@@ -295,6 +337,21 @@
     <div class="menu-icon">🔍</div>
     <div class="menu-text">
       <div class="title">Âge gestationnel connu à une date précise (ex: Échographie obst)</div>
+    </div>
+  </div>
+
+  <div class="install-box" id="installBox">
+    <div class="install-header" onclick="toggleInstall()">
+      <span>📲 Comment installer sur mon téléphone</span>
+      <span class="install-chevron" id="installChevron">▾</span>
+    </div>
+    <div class="install-body" id="installBody">
+      <ol>
+        <li>Ouvrez ce lien depuis <b>Chrome</b> sur votre téléphone.</li>
+        <li>Appuyez sur le menu <b>⋮</b> en haut à droite.</li>
+        <li>Choisissez <b>« Ajouter à l'écran d'accueil »</b>.</li>
+        <li>Appuyez sur <b>« Ajouter »</b>. L'icône CNAS apparaîtra sur votre écran d'accueil.</li>
+      </ol>
     </div>
   </div>
 </div>
@@ -673,6 +730,12 @@ refAnnee.addEventListener('change', () => { remplirJours(refJour, parseInt(refMo
 document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', (e) => { if (e.target === ov) { playWhoosh(false); ov.classList.remove('active'); } });
 });
+
+// ===== Bloc d'installation =====
+function toggleInstall() {
+  document.getElementById('installBody').classList.toggle('open');
+  document.getElementById('installChevron').classList.toggle('open');
+}
 
 // ===== Initialisation =====
 initTriplet(ddrJour, ddrMois, ddrAnnee, 0, 2);
