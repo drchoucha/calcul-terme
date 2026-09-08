@@ -118,6 +118,48 @@
     line-height: 1.4;
   }
 
+  .settings-card {
+    background: linear-gradient(135deg, #ffffff, #f2fbf9);
+    border-radius: 18px;
+    box-shadow: 0 10px 28px rgba(10,61,51,0.35);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    border: 2px solid var(--violet);
+  }
+  .settings-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--violet);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .settings-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+  .settings-field label {
+    font-size: 11px;
+    text-align: center;
+    margin-bottom: 4px;
+    color: var(--deep);
+  }
+  input.week-input {
+    width: 100%;
+    padding: 10px 6px;
+    border: 2px solid #bfe5dd;
+    border-radius: 10px;
+    font-size: 16px;
+    color: var(--deep);
+    background: #fff;
+    font-weight: 700;
+    text-align: center;
+  }
+  input.week-input:focus {
+    outline: none;
+    border-color: var(--magenta);
+  }
+
   /* Overlay & modal popup */
   .overlay {
     display: none;
@@ -290,7 +332,25 @@
 
 <div class="home">
   <h1>🤰 Calcul Terme</h1>
-  <div class="subtitle">Calcul les dates de l'âge gestationnel à la fin des semaines 12, 24, 35, 40</div>
+  <div class="subtitle">Calcul les dates de l'âge gestationnel à la fin des semaines repères (12, 24, 35 par défaut) et 40</div>
+
+  <div class="settings-card">
+    <div class="settings-title">⚙️ Semaines repères personnalisables</div>
+    <div class="settings-row">
+      <div class="settings-field">
+        <label for="semaineRepere1">Repère 1</label>
+        <input type="number" id="semaineRepere1" class="week-input" min="1" max="41" step="1" value="12" inputmode="numeric">
+      </div>
+      <div class="settings-field">
+        <label for="semaineRepere2">Repère 2</label>
+        <input type="number" id="semaineRepere2" class="week-input" min="1" max="41" step="1" value="24" inputmode="numeric">
+      </div>
+      <div class="settings-field">
+        <label for="semaineRepere3">Repère 3</label>
+        <input type="number" id="semaineRepere3" class="week-input" min="1" max="41" step="1" value="35" inputmode="numeric">
+      </div>
+    </div>
+  </div>
 
   <div class="menu-card card-ddr" onclick="ouvrirModal('modalDdr')">
     <div class="menu-icon">📅</div>
@@ -547,6 +607,40 @@ function playWhoosh(ouverture) {
   }
 }
 
+// ===== Semaines repères personnalisables (12 / 24 / 35 par défaut) =====
+const semaineRepere1 = document.getElementById('semaineRepere1');
+const semaineRepere2 = document.getElementById('semaineRepere2');
+const semaineRepere3 = document.getElementById('semaineRepere3');
+let accCalculated = false;
+let refCalculated = false;
+
+function lireSemaineRepere(input, defaut) {
+  let v = parseInt(input.value);
+  if (isNaN(v)) v = defaut;
+  v = Math.min(41, Math.max(1, v));
+  return v;
+}
+function getJalons() {
+  const s1 = lireSemaineRepere(semaineRepere1, 12);
+  const s2 = lireSemaineRepere(semaineRepere2, 24);
+  const s3 = lireSemaineRepere(semaineRepere3, 35);
+  return [
+    { label: `Repère 1 (${s1} SA)`, sa: s1 },
+    { label: `Repère 2 (${s2} SA)`, sa: s2 },
+    { label: `Repère 3 (${s3} SA)`, sa: s3 },
+    { label: "Terme (40 SA)", sa: 40 }
+  ];
+}
+function refreshAllRepere() {
+  calcDdr();
+  if (accCalculated) calculerAcc();
+  if (refCalculated) calcRef();
+}
+[semaineRepere1, semaineRepere2, semaineRepere3].forEach(inp => {
+  inp.addEventListener('input', refreshAllRepere);
+  inp.addEventListener('change', refreshAllRepere);
+});
+
 function ouvrirModal(id) {
   playWhoosh(true);
   document.getElementById(id).classList.add('active');
@@ -579,12 +673,7 @@ function calcDdr() {
     ageActuel.textContent = `${Math.floor(diffDays/7)} SA + ${diffDays%7} j`;
   }
 
-  const jalons = [
-    { label: "Fin 1er trimestre", sa: 12 },
-    { label: "Fin 2e trimestre (24 SA)", sa: 24 },
-    { label: "35 SA", sa: 35 },
-    { label: "Terme (40 SA)", sa: 40 }
-  ];
+  const jalons = getJalons();
   tableBody.innerHTML = '';
   jalons.forEach(jal => {
     const date = addDays(ddr, jal.sa * 7);
@@ -607,18 +696,14 @@ const btnDeduire = document.getElementById('btnDeduire');
 
 accMois.addEventListener('change', () => remplirJours(accJour, parseInt(accMois.value), parseInt(accAnnee.value)));
 accAnnee.addEventListener('change', () => remplirJours(accJour, parseInt(accMois.value), parseInt(accAnnee.value)));
-btnDeduire.addEventListener('click', () => {
+function calculerAcc() {
   const acc = lireDate(accJour, accMois, accAnnee);
   if (!acc) return;
+  accCalculated = true;
   const ddrDeduite = addDays(acc, -280);
   accResult.textContent = `DDR estimée : ${formatDate(ddrDeduite)}`;
 
-  const jalons = [
-    { label: "Fin 1er trimestre", sa: 12 },
-    { label: "Fin 2e trimestre (24 SA)", sa: 24 },
-    { label: "35 SA", sa: 35 },
-    { label: "Terme (40 SA)", sa: 40 }
-  ];
+  const jalons = getJalons();
   const accTableBody = document.getElementById('accTableBody');
   accTableBody.innerHTML = '';
   jalons.forEach(jal => {
@@ -632,7 +717,8 @@ btnDeduire.addEventListener('click', () => {
   // Reporte la DDR déduite dans le module principal
   ecrireDate(ddrJour, ddrMois, ddrAnnee, ddrDeduite);
   calcDdr();
-});
+}
+btnDeduire.addEventListener('click', calculerAcc);
 
 // ===== MODAL 3 : Âge gestationnel connu à une date connue =====
 const refSA = document.getElementById('refSA');
@@ -663,6 +749,7 @@ function calcRef() {
   const ageBox = document.getElementById('refAgeAujourdhuiBox');
   const ageAujourdhui = document.getElementById('refAgeAujourdhui');
   if (!dateRef) { refResult.textContent = '--'; refTableBody.innerHTML = ''; ageBox.style.display = 'none'; return; }
+  refCalculated = true;
 
   const ageJours = sa * 7 + j;
   const ddrDeduite = addDays(dateRef, -ageJours);
@@ -683,12 +770,7 @@ function calcRef() {
     ageBox.style.display = 'block';
   }
 
-  const jalons = [
-    { label: "Fin 1er trimestre", sa: 12 },
-    { label: "Fin 2e trimestre (24 SA)", sa: 24 },
-    { label: "35 SA", sa: 35 },
-    { label: "Terme (40 SA)", sa: 40 }
-  ];
+  const jalons = getJalons();
   refTableBody.innerHTML = '';
   jalons.forEach(jal => {
     const date = addDays(ddrDeduite, jal.sa * 7);
