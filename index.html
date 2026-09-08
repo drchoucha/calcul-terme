@@ -79,47 +79,21 @@
   .menu-card.card-ref .menu-icon { background: linear-gradient(135deg, #1a8fb8, #2ec4b6); }
   .menu-card.card-ref .menu-text .title { color: #0d6a8c; }
 
-  .install-box {
-    margin-top: 8px;
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.25);
-    border-radius: 14px;
-    overflow: hidden;
-    backdrop-filter: blur(2px);
-  }
-  .install-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    user-select: none;
-  }
-  .install-chevron {
-    transition: transform 0.2s;
-    font-size: 16px;
-  }
-  .install-chevron.open { transform: rotate(180deg); }
-  .install-body {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.25s ease, padding 0.25s ease;
-    padding: 0 18px;
-  }
-  .install-body.open {
-    max-height: 300px;
-    padding: 0 18px 16px 18px;
-  }
-  .install-body ol {
-    color: #eafaf5;
+  .about-link {
+    text-align: center;
+    color: rgba(255,255,255,0.75);
     font-size: 13px;
-    line-height: 1.7;
-    padding-left: 20px;
+    font-weight: 600;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    text-decoration: underline;
   }
-  .install-body b { color: #fff; }
+  .modal-about { border-left-color: var(--deep); }
+  .modal-about .modal-title { color: var(--deep); }
+  .modal-about .modal-close { background: linear-gradient(135deg, var(--deep), var(--violet)); }
+  .about-body { font-size: 15px; color: var(--deep); line-height: 1.9; }
+  .about-body a { color: var(--magenta); font-weight: 700; }
   .menu-icon {
     font-size: 28px;
     width: 54px;
@@ -317,7 +291,6 @@
 <div class="home">
   <h1>🤰 Calcul Terme</h1>
   <div class="subtitle">Calcul les dates de l'âge gestationnel à la fin des semaines 12, 24, 35, 40</div>
-  <div class="author">Créé par Dr. CHOUCHA Noureddine — Ksar El Hirane - Laghouat - Algérie</div>
 
   <div class="menu-card card-ddr" onclick="ouvrirModal('modalDdr')">
     <div class="menu-icon">📅</div>
@@ -340,18 +313,21 @@
     </div>
   </div>
 
-  <div class="install-box" id="installBox">
-    <div class="install-header" onclick="toggleInstall()">
-      <span>📲 Comment installer sur mon téléphone</span>
-      <span class="install-chevron" id="installChevron">▾</span>
+  <div class="about-link" onclick="ouvrirModal('modalAbout')">ℹ️ À propos de cette application</div>
+</div>
+
+<!-- MODAL ABOUT : Informations sur l'application -->
+<div class="overlay" id="modalAbout">
+  <div class="modal modal-about">
+    <div class="modal-header">
+      <div class="modal-title">ℹ️ À propos</div>
+      <button class="modal-close" onclick="fermerModal('modalAbout')">✕</button>
     </div>
-    <div class="install-body" id="installBody">
-      <ol>
-        <li>Ouvrez ce lien depuis <b>Chrome</b> sur votre téléphone.</li>
-        <li>Appuyez sur le menu <b>⋮</b> en haut à droite.</li>
-        <li>Choisissez <b>« Ajouter à l'écran d'accueil »</b>.</li>
-        <li>Appuyez sur <b>« Ajouter »</b>. L'icône CNAS apparaîtra sur votre écran d'accueil.</li>
-      </ol>
+    <div class="modal-hint">Application de calcul de l'âge gestationnel</div>
+    <div class="about-body">
+      <div><strong>Créée par :</strong> Dr. CHOUCHA Noureddine</div>
+      <div><strong>Lieu :</strong> Ksar El Hirane - Laghouat - Algérie</div>
+      <div><strong>Contact :</strong> <a href="mailto:drchoucha@gmail.com">drchoucha@gmail.com</a></div>
     </div>
   </div>
 </div>
@@ -730,12 +706,6 @@ refAnnee.addEventListener('change', () => { remplirJours(refJour, parseInt(refMo
 document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', (e) => { if (e.target === ov) { playWhoosh(false); ov.classList.remove('active'); } });
 });
-
-// ===== Bloc d'installation =====
-function toggleInstall() {
-  document.getElementById('installBody').classList.toggle('open');
-  document.getElementById('installChevron').classList.toggle('open');
-}
 
 // ===== Initialisation =====
 initTriplet(ddrJour, ddrMois, ddrAnnee, 0, 2);
